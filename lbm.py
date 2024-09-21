@@ -1,5 +1,7 @@
 import numpy as np
+import matplotlib.pyplot as plt
 from lbm_funcs import *
+from lbm_consts import *
 
 # -------- Main Objectives ------------
 # this is a D2Q9 Lattice Boltzmann simulation
@@ -37,44 +39,36 @@ from lbm_funcs import *
 #    / | \     
 #   7  4  8           
 
-D = 2
-Q = 9
-STEPS = 10_000
-
-NX = 300
-NY = 50
-
-C = np.array([
-  [0, 1, 0, -1, 0, 1, -1, -1, 1],
-  [0, 0, 1, 0, -1, 1, 1, -1, -1]
-])
-
-W = np.array([
-  4/9,
-  1/9, 1/9, 1/9, 1/9, 
-  1/36, 1/36, 1/36, 1/36 
-])
-
-# speed of sound in lattice units
-CS = 1 / np.sqrt(3)
-
-TAU = 0.6
-
-indices = np.array(range(9))
-opposite_indices = np.array([
-  0, 3, 4, 1, 2, 7, 8, 5, 6
-])
-
 # --------- Initial Conditions of Macroscopic Quantities ----------
 # ρ: [NX][NY] (1 scalar for each lattice)
 rho  = np.ones((NX, NY))
 # u: [NX][NY][2] (1 2D vector for each lattice)
 u    = np.zeros((NX, NY, D))
+u[:, :, 1] = 1e-4
 
 # f: [NX][NY][9] (these are all the fs (velocity populations))
 f     = equilibrium(rho, u)
-f_new = equilibrium(rho, u)
+# f_new = equilibrium(rho, u)
 # this works like double buffering in CG. f_new will hold the new values of f until we do streaming,
 # this prevents bugs because we may overwrite values we still want to get.
-
 # -----------------------------------------------------------------
+
+once = False
+for step in range(STEPS):
+  f_new = collide(f, rho, u)
+
+  stream(f, f_new)
+
+  apply_boundary_conditions(f, rho, u, rho_inflow, u_inflow)
+
+  rho, u = compute_macroscopic(f)
+
+  if step % 250 == 0:
+    plt.imshow(np.sqrt(u[:, :, 0]**2 + u[:, :, 1]**2).T, cmap="jet")
+    plt.title(f"Velocity magnitude at step {step}")
+    if (not once):
+      plt.colorbar()
+      once = not once
+    plt.pause(0.01)
+
+plt.show()
