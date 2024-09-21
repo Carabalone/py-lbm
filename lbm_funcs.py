@@ -89,4 +89,4 @@ def apply_outflow_boundary(f, rho, u):
 def apply_boundary_conditions(f, rho, u, rho_inflow, u_inflow):
   apply_inflow_boundary(f, rho, u, rho_inflow, u_inflow)
   apply_cylinder_boundary(f)
-  # apply_outflow_boundary(f, rho, u)
+  apply_outflow_boundary(f, rho, u)
