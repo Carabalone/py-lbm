@@ -1,5 +1,4 @@
 import numpy as np
-from numpy.linalg import inv, diag
 # each lattice will have this structure with discrete velocities:
 #  
 #   6  2  5   

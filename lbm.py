@@ -1,7 +1,8 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from lbm_funcs import *
+#from lbm_funcs_bgk import *
 from lbm_consts import *
+from lbm_funcs_mrt import *
 
 # -------- Main Objectives ------------
 # this is a D2Q9 Lattice Boltzmann simulation
@@ -63,12 +64,13 @@ for step in range(STEPS):
 
   rho, u = compute_macroscopic(f)
 
-  if step % 250 == 0:
-    plt.imshow(np.sqrt(u[:, :, 0]**2 + u[:, :, 1]**2).T, cmap="jet")
-    plt.title(f"Velocity magnitude at step {step}")
-    if (not once):
-      plt.colorbar()
-      once = not once
-    plt.pause(0.01)
+  if step % 100 == 0:
+    np.save(f"animation/velocity_magnitude_step_{step}.npy", u)
+    # plt.imshow(np.sqrt(u[:, :, 0]**2 + u[:, :, 1]**2).T, cmap="jet")
+    # plt.title(f"Velocity magnitude at step {step}")
+    # if (not once):
+    #   plt.colorbar()
+    #   once = not once
+    # plt.pause(0.01)
 
 plt.show()
